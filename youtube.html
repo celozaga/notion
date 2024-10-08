@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+.videos {
+  width: 100%;
+}
+
+.youtube-video-list {
+  display: flex;
+  gap: 20px; /* Espaço entre os itens */
+  list-style-type: none;
+  padding: 0;
+  overflow-x: auto; /* Cria rolagem horizontal */
+}
+
+.youtube-video-list li {
+  flex: 0 0 320px; /* Largura de cada item */
+}
+
+.youtube-video-list a {
+  display: block;
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* Proporção 16:9 */
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.youtube-video-list h3 {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: white;
+  font-size: 16px;
+  padding: 5px;
+
+}
+.youtube-video-list svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  fill: white;
+  opacity: 0.8;
+  width: 50px;
+  height: 50px;
+}
+
+</style>
+<section class="videos">
+<ul class="youtube-video-list"></ul>  
+</section>
+
+<script>
+    fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.youtube.com/feeds/videos.xml?channel_id=UCvOnTTQp_7ZXtWUZYEUZO7Q')
+      .then(response => response.json())
+      .then(data => {
+        const videos = data.items.slice(0, 5); // Limita para os 5 primeiros vídeos
+        const videoList = document.querySelector('.youtube-video-list');
+        
+        videos.forEach(video => {
+          const videoId = video.link.split('=')[1]; // Obtém o ID do vídeo
+          let thumbnail = video.thumbnail; // Miniatura do vídeo
+          const title = video.title; // Título do vídeo
+          const url = video.link; // URL do vídeo
+  
+          // Substitui 'hqdefault' por 'maxresdefault' na URL da thumbnail
+          thumbnail = thumbnail.replace('hqdefault', 'maxresdefault');
+          
+          // Cria o item da lista
+          const li = `
+            <li>
+              <a href="${url}" title="${title}" style="background-image: url(${thumbnail});" target="_blank">
+                <h3>${title}</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960"><path d="m380-300 280-180-280-180v360ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z"/></svg>
+              </a>
+            </li>
+          `;
+          videoList.innerHTML += li; // Adiciona o item da lista à página
+        });
+      });
+  </script>
+
+</body>
+</html>
